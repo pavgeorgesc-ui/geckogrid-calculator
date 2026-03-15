@@ -3,129 +3,810 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeckoGrid Calculator</title>
+  <title>GeckoGrid Layout Planner</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 760px;
-      margin: 40px auto;
-      padding: 20px;
-      line-height: 1.5;
-      background: #f5f7f6;
-      color: #1f2933;
+    :root {
+      --bg: #f5f7f6;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #5b6975;
+      --line: #d9e2ec;
+      --accent: #2f855a;
+      --accent-dark: #276749;
+      --soft: #eef8f1;
+      --warn-bg: #fff8e6;
+      --warn-border: #d69e2e;
+      --std: #c6f6d5;
+      --small: #fbd38d;
+      --gridline: #94a3b8;
     }
 
-    .box {
-      background: white;
-      padding: 28px;
-      border-radius: 14px;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+
+    .title-card {
+      background: var(--card);
+      border-radius: 16px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 24px;
+      margin-bottom: 18px;
     }
 
     h1 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      color: #1f2933;
+      margin: 0 0 8px 0;
+      font-size: 2.2rem;
     }
 
-    p {
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr 420px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 22px;
+    }
+
+    h2 {
       margin-top: 0;
-      color: #52606d;
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+    }
+
+    .group {
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     label {
       display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
       font-weight: bold;
+      margin-bottom: 6px;
+      margin-top: 14px;
     }
 
-    input {
+    input, select {
       width: 100%;
-      max-width: 260px;
-      padding: 10px 12px;
+      padding: 11px 12px;
       border: 1px solid #cbd2d9;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
     }
 
     button {
-      margin-top: 22px;
-      padding: 12px 18px;
       border: none;
-      border-radius: 8px;
-      background: #2f855a;
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: var(--accent);
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       cursor: pointer;
     }
 
     button:hover {
-      background: #276749;
+      background: var(--accent-dark);
     }
 
-    .result {
-      margin-top: 24px;
+    button.secondary {
+      background: #718096;
+    }
+
+    button.secondary:hover {
+      background: #4a5568;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .stat {
+      background: var(--soft);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: bold;
+    }
+
+    .parts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .part {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfcfd;
+    }
+
+    .part-name {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 5px;
+    }
+
+    .part-qty {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .warning {
+      margin-top: 16px;
+      background: var(--warn-bg);
+      border-left: 4px solid var(--warn-border);
+      border-radius: 10px;
+      padding: 14px;
+      line-height: 1.5;
+    }
+
+    .preview-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 320px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: #fcfdfd;
       padding: 18px;
-      background: #f0fff4;
-      border-left: 4px solid #2f855a;
-      border-radius: 8px;
+      overflow: auto;
     }
 
-    .note {
+    .layout-preview {
+      display: grid;
+      gap: 6px;
+      align-items: stretch;
+      justify-content: start;
+    }
+
+    .cell {
+      height: 56px;
+      border-radius: 8px;
+      border: 2px solid var(--gridline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #334155;
+      position: relative;
+    }
+
+    .cell.standard {
+      background: var(--std);
+      width: 78px;
+    }
+
+    .cell.small {
+      background: var(--small);
+      width: 58px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
       margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1px solid var(--gridline);
+    }
+
+    .legend-standard {
+      background: var(--std);
+    }
+
+    .legend-small {
+      background: var(--small);
+    }
+
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .mini-btn {
+      width: 100%;
+    }
+
+    .alt-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alt-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #fbfcfd;
+    }
+
+    .alt-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .alt-meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .alt-card button {
+      margin-top: 10px;
+      padding: 9px 12px;
       font-size: 14px;
-      color: #52606d;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 1150px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>GeckoGrid Calculator</h1>
-    <p>Enter your wall size to get a basic GeckoGrid layout estimate.</p>
-
-    <label for="width">Wall width (cm)</label>
-    <input type="number" id="width" placeholder="118" step="0.1" />
-
-    <label for="height">Wall height (cm)</label>
-    <input type="number" id="height" placeholder="69.5" step="0.1" />
-
-    <button onclick="calculate()">Calculate</button>
-
-    <div class="result" id="result">
-      Results will appear here.
+  <div class="page">
+    <div class="title-card">
+      <h1>GeckoGrid Layout Planner</h1>
+      <p class="subtitle">
+        Enter your available wall space and GeckoGrid will suggest a no-cut layout that fits,
+        estimate the part quantities, and show a simple visual preview.
+      </p>
     </div>
 
-    <div class="note">
-      Starter version only. Next step: add exact GeckoGrid modules, small centre sections, hubs, arms, and panel quantities.
+    <div class="main-grid">
+      <div class="card">
+        <h2>Space & options</h2>
+
+        <div class="group">
+          <label for="wallWidth">Available wall width (cm)</label>
+          <input type="number" id="wallWidth" value="126" step="0.1" />
+
+          <label for="wallHeight">Available wall height (cm)</label>
+          <input type="number" id="wallHeight" value="80" step="0.1" />
+
+          <label for="mode">Optimisation mode</label>
+          <select id="mode">
+            <option value="balanced">Balanced best fit</option>
+            <option value="standard">Prefer standard panels</option>
+            <option value="coverage">Max coverage</option>
+          </select>
+        </div>
+
+        <div class="group">
+          <h3>Mounting clearance</h3>
+
+          <label for="leftClear">Left clearance (cm)</label>
+          <input type="number" id="leftClear" value="2" step="0.1" />
+
+          <label for="rightClear">Right clearance (cm)</label>
+          <input type="number" id="rightClear" value="2" step="0.1" />
+
+          <label for="topClear">Top clearance (cm)</label>
+          <input type="number" id="topClear" value="3.5" step="0.1" />
+
+          <label for="bottomClear">Bottom clearance (cm)</label>
+          <input type="number" id="bottomClear" value="3.5" step="0.1" />
+        </div>
+
+        <div class="button-row">
+          <button onclick="findBestLayouts()">Find best layout</button>
+          <button class="secondary" onclick="loadExampleLarge()">Load large example</button>
+          <button class="secondary" onclick="loadExampleSmall()">Load small example</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Recommended layout</h2>
+        <div id="resultsArea">
+          <p class="muted">Run the planner to see the best fitting GeckoGrid layout.</p>
+        </div>
+
+        <div class="group" style="margin-top:20px;">
+          <h3>Alternative layouts</h3>
+          <div id="alternativesArea" class="alt-list">
+            <p class="muted">Alternatives will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Visual preview</h2>
+        <div class="preview-wrap">
+          <div id="previewArea" class="muted">No layout selected yet.</div>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item">
+            <span class="legend-box legend-standard"></span>
+            Standard panel
+          </div>
+          <div class="legend-item">
+            <span class="legend-box legend-small"></span>
+            Small panel
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button class="mini-btn" onclick="adjustLayout('addStandard')">+ Standard</button>
+          <button class="mini-btn" onclick="adjustLayout('removeStandard')">- Standard</button>
+          <button class="mini-btn" onclick="adjustLayout('addSmall')">+ Small</button>
+          <button class="mini-btn" onclick="adjustLayout('removeSmall')">- Small</button>
+          <button class="mini-btn" onclick="adjustLayout('addRow')">+ Row</button>
+          <button class="mini-btn" onclick="adjustLayout('removeRow')">- Row</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    function calculate() {
-      const width = parseFloat(document.getElementById("width").value);
-      const height = parseFloat(document.getElementById("height").value);
+    // Core known sizes from your real GeckoGrid examples
+    const STANDARD_PANEL_W = 23.5;
+    const SMALL_PANEL_W = 17.5;
+    const PANEL_H = 21.2;
 
-      if (isNaN(width) || isNaN(height)) {
-        document.getElementById("result").innerHTML =
-          "Please enter both wall width and wall height.";
+    // Derived from your real measured examples
+    // Width: 2 standards = 50cm total, 4 standards + 1 small = 117.5cm total
+    // Height: 3 rows = 70cm total
+    const WIDTH_STANDARD_UNIT = 24.5;
+    const WIDTH_SMALL_UNIT = 18.5;
+    const WIDTH_EDGE_ADD = 1.0;
+
+    const HEIGHT_ROW_UNIT = 22.8;
+    const HEIGHT_EDGE_ADD = 1.6;
+
+    let currentLayout = null;
+    let lastAlternatives = [];
+
+    function round1(n) {
+      return Math.round(n * 10) / 10;
+    }
+
+    function getInputs() {
+      return {
+        wallWidth: parseFloat(document.getElementById("wallWidth").value),
+        wallHeight: parseFloat(document.getElementById("wallHeight").value),
+        leftClear: parseFloat(document.getElementById("leftClear").value),
+        rightClear: parseFloat(document.getElementById("rightClear").value),
+        topClear: parseFloat(document.getElementById("topClear").value),
+        bottomClear: parseFloat(document.getElementById("bottomClear").value),
+        mode: document.getElementById("mode").value
+      };
+    }
+
+    function calcLayout(rows, standardPerRow, smallPerRow, inputs) {
+      const totalColumns = standardPerRow + smallPerRow;
+
+      if (rows < 1 || totalColumns < 1) return null;
+
+      const frameWidth = (WIDTH_STANDARD_UNIT * standardPerRow) + (WIDTH_SMALL_UNIT * smallPerRow) + WIDTH_EDGE_ADD;
+      const frameHeight = (HEIGHT_ROW_UNIT * rows) + HEIGHT_EDGE_ADD;
+
+      const requiredWidth = frameWidth + inputs.leftClear + inputs.rightClear;
+      const requiredHeight = frameHeight + inputs.topClear + inputs.bottomClear;
+
+      const fits = requiredWidth <= inputs.wallWidth && requiredHeight <= inputs.wallHeight;
+
+      const standardPanels = rows * standardPerRow;
+      const smallPanels = rows * smallPerRow;
+
+      const centralHubs = (totalColumns - 1) * (rows - 1);
+      const tJunctions = (2 * (totalColumns - 1)) + (2 * (rows - 1));
+      const cornerPieces = 4;
+
+      const longArms = (rows + 1) * standardPerRow;
+      const mediumArms = (totalColumns + 1) * rows;
+      const shortArms = (rows + 1) * smallPerRow;
+
+      const usedArea = frameWidth * frameHeight;
+      const availableArea = inputs.wallWidth * inputs.wallHeight;
+      const coverage = availableArea > 0 ? usedArea / availableArea : 0;
+
+      const leftoverWidth = inputs.wallWidth - requiredWidth;
+      const leftoverHeight = inputs.wallHeight - requiredHeight;
+
+      return {
+        rows,
+        standardPerRow,
+        smallPerRow,
+        totalColumns,
+        frameWidth: round1(frameWidth),
+        frameHeight: round1(frameHeight),
+        requiredWidth: round1(requiredWidth),
+        requiredHeight: round1(requiredHeight),
+        fits,
+        leftoverWidth: round1(leftoverWidth),
+        leftoverHeight: round1(leftoverHeight),
+        standardPanels,
+        smallPanels,
+        centralHubs,
+        tJunctions,
+        cornerPieces,
+        longArms,
+        mediumArms,
+        shortArms,
+        coverage,
+        usedArea
+      };
+    }
+
+    function scoreLayout(layout, mode) {
+      if (!layout || !layout.fits) return -999999;
+
+      const leftoverPenalty = (Math.abs(layout.leftoverWidth) * 4) + (Math.abs(layout.leftoverHeight) * 6);
+      const smallPenalty = layout.smallPanels * 2.5;
+      const complexityPenalty = layout.shortArms * 1.2;
+      const standardReward = layout.standardPanels * 2;
+      const coverageReward = layout.coverage * 300;
+      const rowsPenalty = layout.rows * 0.5;
+
+      if (mode === "standard") {
+        return 500 + standardReward + coverageReward - smallPenalty - complexityPenalty - leftoverPenalty - rowsPenalty;
+      }
+
+      if (mode === "coverage") {
+        return 500 + (layout.coverage * 420) + (layout.standardPanels * 1.2) - (layout.smallPanels * 1.2) - (leftoverPenalty * 0.7);
+      }
+
+      // balanced
+      return 500 + coverageReward + standardReward - smallPenalty - complexityPenalty - leftoverPenalty - rowsPenalty;
+    }
+
+    function generateCandidates(inputs) {
+      const candidates = [];
+
+      for (let rows = 1; rows <= 6; rows++) {
+        for (let std = 0; std <= 10; std++) {
+          for (let small = 0; small <= 6; small++) {
+            if (std + small < 1) continue;
+            const layout = calcLayout(rows, std, small, inputs);
+            if (layout && layout.fits) {
+              layout.score = scoreLayout(layout, inputs.mode);
+              candidates.push(layout);
+            }
+          }
+        }
+      }
+
+      candidates.sort((a, b) => b.score - a.score);
+      return candidates;
+    }
+
+    function layoutSignature(layout) {
+      return `${layout.rows}-${layout.standardPerRow}-${layout.smallPerRow}`;
+    }
+
+    function findBestLayouts() {
+      const inputs = getInputs();
+
+      if (
+        isNaN(inputs.wallWidth) || isNaN(inputs.wallHeight) ||
+        isNaN(inputs.leftClear) || isNaN(inputs.rightClear) ||
+        isNaN(inputs.topClear) || isNaN(inputs.bottomClear)
+      ) {
+        alert("Please enter valid numbers in all fields.");
         return;
       }
 
-      const standardSquare = 23.6; // placeholder value in cm
+      const candidates = generateCandidates(inputs);
 
-      const horizontalCount = Math.floor(width / standardSquare);
-      const verticalCount = Math.floor(height / standardSquare);
-      const totalStandardSpaces = horizontalCount * verticalCount;
+      if (candidates.length === 0) {
+        currentLayout = null;
+        lastAlternatives = [];
+        document.getElementById("resultsArea").innerHTML = `
+          <div class="warning">
+            No no-cut GeckoGrid layout fits within the available wall space using the current clearance values.
+            Try increasing the available space or reducing the mounting clearance.
+          </div>
+        `;
+        document.getElementById("alternativesArea").innerHTML = `<p class="muted">No alternatives available.</p>`;
+        document.getElementById("previewArea").innerHTML = `<span class="muted">No layout fits this space.</span>`;
+        return;
+      }
 
-      document.getElementById("result").innerHTML = `
-        <strong>Estimated layout</strong><br><br>
-        Horizontal standard spaces: ${horizontalCount}<br>
-        Vertical standard spaces: ${verticalCount}<br>
-        Total standard spaces: ${totalStandardSpaces}<br><br>
-        <em>This is the first rough estimate only.</em>
-      `;
+      const best = candidates[0];
+      currentLayout = best;
+
+      const seen = new Set([layoutSignature(best)]);
+      const alternatives = [];
+
+      for (const candidate of candidates) {
+        const sig = layoutSignature(candidate);
+        if (!seen.has(sig)) {
+          seen.add(sig);
+          alternatives.push(candidate);
+        }
+        if (alternatives.length >= 3) break;
+      }
+
+      lastAlternatives = alternatives;
+      renderCurrentLayout();
+      renderAlternatives();
     }
+
+    function renderCurrentLayout() {
+      if (!currentLayout) return;
+
+      const layout = currentLayout;
+
+      document.getElementById("resultsArea").innerHTML = `
+        <div class="group">
+          <h3>Layout summary</h3>
+          <div class="results-grid">
+            <div class="stat">
+              <div class="stat-label">Rows</div>
+              <div class="stat-value">${layout.rows}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Total columns</div>
+              <div class="stat-value">${layout.totalColumns}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Standard panels per row</div>
+              <div class="stat-value">${layout.standardPerRow}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Small panels per row</div>
+              <div class="stat-value">${layout.smallPerRow}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Total standard panels</div>
+              <div class="stat-value">${layout.standardPanels}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Total small panels</div>
+              <div class="stat-value">${layout.smallPanels}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Frame & required wall space</h3>
+          <div class="results-grid">
+            <div class="stat">
+              <div class="stat-label">Frame width</div>
+              <div class="stat-value">${layout.frameWidth} cm</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Frame height</div>
+              <div class="stat-value">${layout.frameHeight} cm</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Required width incl. fittings</div>
+              <div class="stat-value">${layout.requiredWidth} cm</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Required height incl. fittings</div>
+              <div class="stat-value">${layout.requiredHeight} cm</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Leftover wall width</div>
+              <div class="stat-value">${layout.leftoverWidth} cm</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Leftover wall height</div>
+              <div class="stat-value">${layout.leftoverHeight} cm</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Parts needed</h3>
+          <div class="parts-grid">
+            <div class="part">
+              <div class="part-name">Central 4-way hubs</div>
+              <div class="part-qty">${layout.centralHubs}</div>
+            </div>
+            <div class="part">
+              <div class="part-name">Side T-junction hubs</div>
+              <div class="part-qty">${layout.tJunctions}</div>
+            </div>
+            <div class="part">
+              <div class="part-name">2-way corner hubs</div>
+              <div class="part-qty">${layout.cornerPieces}</div>
+            </div>
+            <div class="part">
+              <div class="part-name">Long horizontal arms</div>
+              <div class="part-qty">${layout.longArms}</div>
+            </div>
+            <div class="part">
+              <div class="part-name">Medium vertical arms</div>
+              <div class="part-qty">${layout.mediumArms}</div>
+            </div>
+            <div class="part">
+              <div class="part-name">Short horizontal arms</div>
+              <div class="part-qty">${layout.shortArms}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warning">
+          <strong>Important:</strong> GeckoGrid was designed with M4 sticky pad fittings in mind.
+          These can extend outside the frame border. Always allow extra mounting space around the frame.
+          This planner includes the clearance values entered on the left.
+        </div>
+      `;
+
+      renderPreview(layout);
+    }
+
+    function renderPreview(layout) {
+      let html = `<div class="layout-preview" style="grid-template-columns: repeat(${layout.totalColumns}, max-content);">`;
+
+      for (let r = 0; r < layout.rows; r++) {
+        for (let s = 0; s < layout.standardPerRow; s++) {
+          html += `<div class="cell standard">Standard</div>`;
+        }
+        for (let m = 0; m < layout.smallPerRow; m++) {
+          html += `<div class="cell small">Small</div>`;
+        }
+      }
+
+      html += `</div>`;
+      document.getElementById("previewArea").innerHTML = html;
+    }
+
+    function renderAlternatives() {
+      if (!lastAlternatives.length) {
+        document.getElementById("alternativesArea").innerHTML = `<p class="muted">No alternatives available.</p>`;
+        return;
+      }
+
+      document.getElementById("alternativesArea").innerHTML = lastAlternatives.map((layout, index) => `
+        <div class="alt-card">
+          <div class="alt-title">Option ${index + 2}: ${layout.rows} rows, ${layout.standardPerRow} standard, ${layout.smallPerRow} small per row</div>
+          <div class="alt-meta">
+            Frame: ${layout.frameWidth} × ${layout.frameHeight} cm<br>
+            Required wall space: ${layout.requiredWidth} × ${layout.requiredHeight} cm<br>
+            Panels: ${layout.standardPanels} standard, ${layout.smallPanels} small
+          </div>
+          <button onclick="selectAlternative(${index})">Use this layout</button>
+        </div>
+      `).join("");
+    }
+
+    function selectAlternative(index) {
+      currentLayout = lastAlternatives[index];
+      renderCurrentLayout();
+    }
+
+    function adjustLayout(action) {
+      if (!currentLayout) return;
+
+      let rows = currentLayout.rows;
+      let std = currentLayout.standardPerRow;
+      let small = currentLayout.smallPerRow;
+
+      if (action === "addStandard") std += 1;
+      if (action === "removeStandard") std = Math.max(0, std - 1);
+      if (action === "addSmall") small += 1;
+      if (action === "removeSmall") small = Math.max(0, small - 1);
+      if (action === "addRow") rows += 1;
+      if (action === "removeRow") rows = Math.max(1, rows - 1);
+
+      if (std + small < 1) {
+        std = 1;
+      }
+
+      const inputs = getInputs();
+      const newLayout = calcLayout(rows, std, small, inputs);
+
+      if (!newLayout || !newLayout.fits) {
+        alert("That change would make the layout too large for the available wall space.");
+        return;
+      }
+
+      currentLayout = newLayout;
+      renderCurrentLayout();
+    }
+
+    function loadExampleLarge() {
+      document.getElementById("wallWidth").value = 121.5;
+      document.getElementById("wallHeight").value = 77;
+      document.getElementById("leftClear").value = 2;
+      document.getElementById("rightClear").value = 2;
+      document.getElementById("topClear").value = 3.5;
+      document.getElementById("bottomClear").value = 3.5;
+      document.getElementById("mode").value = "balanced";
+      currentLayout = calcLayout(3, 4, 1, getInputs());
+      renderCurrentLayout();
+      document.getElementById("alternativesArea").innerHTML = `<p class="muted">Example loaded. Click "Find best layout" to generate alternatives.</p>`;
+    }
+
+    function loadExampleSmall() {
+      document.getElementById("wallWidth").value = 54;
+      document.getElementById("wallHeight").value = 77;
+      document.getElementById("leftClear").value = 2;
+      document.getElementById("rightClear").value = 2;
+      document.getElementById("topClear").value = 3.5;
+      document.getElementById("bottomClear").value = 3.5;
+      document.getElementById("mode").value = "balanced";
+      currentLayout = calcLayout(3, 2, 0, getInputs());
+      renderCurrentLayout();
+      document.getElementById("alternativesArea").innerHTML = `<p class="muted">Example loaded. Click "Find best layout" to generate alternatives.</p>`;
+    }
+
+    // Load an initial suggestion on first open
+    window.onload = function () {
+      findBestLayouts();
+    };
   </script>
 </body>
 </html>
