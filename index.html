@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeckoGrid Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.5;
+      background: #f5f7f6;
+      color: #1f2933;
+    }
+
+    .box {
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #1f2933;
+    }
+
+    p {
+      margin-top: 0;
+      color: #52606d;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      max-width: 260px;
+      padding: 10px 12px;
+      border: 1px solid #cbd2d9;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 22px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #2f855a;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #276749;
+    }
+
+    .result {
+      margin-top: 24px;
+      padding: 18px;
+      background: #f0fff4;
+      border-left: 4px solid #2f855a;
+      border-radius: 8px;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #52606d;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>GeckoGrid Calculator</h1>
+    <p>Enter your wall size to get a basic GeckoGrid layout estimate.</p>
+
+    <label for="width">Wall width (cm)</label>
+    <input type="number" id="width" placeholder="118" step="0.1" />
+
+    <label for="height">Wall height (cm)</label>
+    <input type="number" id="height" placeholder="69.5" step="0.1" />
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="result" id="result">
+      Results will appear here.
+    </div>
+
+    <div class="note">
+      Starter version only. Next step: add exact GeckoGrid modules, small centre sections, hubs, arms, and panel quantities.
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const width = parseFloat(document.getElementById("width").value);
+      const height = parseFloat(document.getElementById("height").value);
+
+      if (isNaN(width) || isNaN(height)) {
+        document.getElementById("result").innerHTML =
+          "Please enter both wall width and wall height.";
+        return;
+      }
+
+      const standardSquare = 23.6; // placeholder value in cm
+
+      const horizontalCount = Math.floor(width / standardSquare);
+      const verticalCount = Math.floor(height / standardSquare);
+      const totalStandardSpaces = horizontalCount * verticalCount;
+
+      document.getElementById("result").innerHTML = `
+        <strong>Estimated layout</strong><br><br>
+        Horizontal standard spaces: ${horizontalCount}<br>
+        Vertical standard spaces: ${verticalCount}<br>
+        Total standard spaces: ${totalStandardSpaces}<br><br>
+        <em>This is the first rough estimate only.</em>
+      `;
+    }
+  </script>
+</body>
+</html>
