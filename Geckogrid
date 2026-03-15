@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeckoGrid Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    input {
+      padding: 8px;
+      margin: 6px 0 12px 0;
+      width: 100%;
+      max-width: 250px;
+    }
+    button {
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>GeckoGrid Calculator</h1>
+  <p>Enter the wall size and get a basic layout estimate.</p>
+
+  <label>Width (cm)</label>
+  <input type="number" id="width" placeholder="e.g. 118" />
+
+  <label>Height (cm)</label>
+  <input type="number" id="height" placeholder="e.g. 69.5" />
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="result" id="result">
+    Results will appear here.
+  </div>
+
+  <script>
+    function calculate() {
+      const width = parseFloat(document.getElementById("width").value);
+      const height = parseFloat(document.getElementById("height").value);
+
+      if (isNaN(width) || isNaN(height)) {
+        document.getElementById("result").innerHTML = "Please enter both width and height.";
+        return;
+      }
+
+      const standardCell = 23.6;   // example value
+      const smallCell = 11.8;      // example value
+
+      const cols = Math.floor(width / standardCell);
+      const rows = Math.floor(height / standardCell);
+
+      document.getElementById("result").innerHTML = `
+        <strong>Estimated layout:</strong><br>
+        Standard columns: ${cols}<br>
+        Standard rows: ${rows}<br>
+        Total standard spaces: ${cols * rows}<br><br>
+        <em>This is just the starter version. Later we can add small center panels, arms, hubs, and exact part counts.</em>
+      `;
+    }
+  </script>
+</body>
+</html>
